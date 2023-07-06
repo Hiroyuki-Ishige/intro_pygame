@@ -17,13 +17,13 @@ Import image
 """
 sky_surface = pygame.image.load("graphics/sky(800).jpg").convert()  # Import image
 ground_surface = pygame.image.load("graphics/ground(800).jpg").convert()  # Import image
-snail_surface = pygame.image.load("graphics/snail/snail_2.png").convert_alpha()
-snail_rect = snail_surface.get_rect(bottomright=(800, 300))
+snail_surf = pygame.image.load("graphics/snail/snail_2.png").convert_alpha()
+snail_rect = snail_surf.get_rect(bottomright=(800, 300))
 
 # snail_x_pos = 750
 
-player_surface = pygame.image.load("graphics/player/player.png").convert_alpha()  # import image
-player_rect = player_surface.get_rect(bottomleft=(50, 300))  # set rectanble
+player_surf = pygame.image.load("graphics/player/player.png").convert_alpha()  # import image
+player_rect = player_surf.get_rect(bottomleft=(50, 300))  # set rectanble
 
 while True:  # This while roop is important to keep screen showing
     for event in pygame.event.get():  # Keep looking all event
@@ -31,20 +31,31 @@ while True:  # This while roop is important to keep screen showing
             pygame.quit()
             exit()  # stop system and exit while roop
 
+        # if event.type == pygame.MOUSEMOTION: #Check if mouse is moved
+        #     if player_rect.collidepoint(event.pos):
+        #         print("collision")
+
+
     # draw all out elements
     screen.blit(text_surface, (0, 0))  # attach image to screen
     screen.blit(sky_surface, (50, 50))  # attach image to screen
     screen.blit(ground_surface, (50, 300))  # attach image to screen
-    screen.blit(snail_surface, snail_rect)  # attach image to screen
-    screen.blit(player_surface, player_rect)  # attach image to screen
+    screen.blit(snail_surf, snail_rect)  # attach image to screen
+    screen.blit(player_surf, player_rect)  # attach image to screen
 
-    # snail_x_pos -= 2
-    snail_rect.left -=1
-    player_rect.left +=1
+    # print(snail_rect.left)
+    snail_rect.x -=3
+    player_rect.x +=1
 
+    if snail_rect.left < 50: snail_rect.left = 800
 
-    if snail_rect.left < 0:
-        snail_rect.left = 800
+    # if player_rect.colliderect(snail_rect): #This will return 0(False) if no collide, 1 if collide (True)
+    #     print("collision")
+
+    mouse_pos = pygame.mouse.get_pos() #Get position of the mouse
+    if player_rect.collidepoint(mouse_pos):
+        print("collision")
+        print(pygame.mouse.get_pressed()) #Check if any button of mouse if pressed
 
     pygame.display.update()  # update everything
     clock.tick(FLAME_RATE)
