@@ -20,6 +20,7 @@ sky_surface = pygame.image.load("graphics/sky(800).jpg").convert()  # Import ima
 ground_surface = pygame.image.load("graphics/ground(800).jpg").convert()  # Import image
 snail_surf = pygame.image.load("graphics/snail/snail_2.png").convert_alpha()
 snail_rect = snail_surf.get_rect(bottomright=(800, 300))
+player_gravity = 0
 
 # snail_x_pos = 750
 
@@ -32,16 +33,29 @@ while True:  # This while roop is important to keep screen showing
             pygame.quit()
             exit()  # stop system and exit while roop
 
-        # if event.type == pygame.MOUSEMOTION: #Check if mouse is moved
-        #     if player_rect.collidepoint(event.pos):
-        #         print("collision")
+        #(Method 1) even by key press
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                player_gravity = -5
+                # player_rect.y += player_gravity
 
-    # draw all out elements
+        if event.type == pygame.MOUSEBUTTONDOWN: #Check if mouse buttom is pressed
+            if player_rect.collidepoint(event.pos):
+                player_gravity = -5
+                print(event.pos)
+
+    # draw elements
     screen.blit(text_surf, (0, 0))  # attach image to screen
     screen.blit(sky_surface, (50, 50))  # attach image to screen
     screen.blit(ground_surface, (50, 300))  # attach image to screen
     screen.blit(snail_surf, snail_rect)  # attach image to screen
+
     screen.blit(player_surf, player_rect)  # attach image to screen
+
+    print(player_rect.y)
+    player_gravity += 0.3
+    player_rect.y += player_gravity
+
     pygame.draw.rect(screen, "#c0e8ec", score_rect)
 
     # pygame.draw.line(screen, "white", start_pos=(50, 50), end_pos=pygame.mouse.get_pos(), width=5) #Draw line
@@ -49,24 +63,24 @@ while True:  # This while roop is important to keep screen showing
 
     # print(snail_rect.left)
     snail_rect.x -= 3
-    player_rect.x += 1
+
 
     if snail_rect.left < 50: snail_rect.left = 800
 
     # if player_rect.colliderect(snail_rect): #This will return 0(False) if no collide, 1 if collide (True)
     #     print("collision")
 
-#TODO to set jump when space key is pressed
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_SPACE]:
-        print("jump")
-
-    # mouse position ------------------------------
-    mouse_pos = pygame.mouse.get_pos()  # Get position of the mouse
-    if player_rect.collidepoint(mouse_pos):
-        print("collision")
-        print(pygame.mouse.get_pressed())  # Check if any button of mouse if pressed
-    #-----------------------------------------------
+    # (Method 2) event by a key is pressed
+    # keys = pygame.key.get_pressed()
+    # if keys[pygame.K_SPACE]:
+    #     print("jump")
+    #
+    # # mouse position ------------------------------
+    # mouse_pos = pygame.mouse.get_pos()  # Get position of the mouse
+    # if player_rect.collidepoint(mouse_pos):
+    #     print("collision")
+    #     print(pygame.mouse.get_pressed())  # Check if any button of mouse if pressed
+    # #-----------------------------------------------
 
     pygame.display.update()  # update everything
     clock.tick(FLAME_RATE)

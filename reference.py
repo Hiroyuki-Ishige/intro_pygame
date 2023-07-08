@@ -1,7 +1,7 @@
 """
 Ultimate introduction of pygame
 
-#TODO see from 1:15:50
+#TODO see from 1:44:46 (set floor)
 https://youtu.be/AY9MnQ4x3zk
 
 Explanation on Rectangle 51:40
