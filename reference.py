@@ -1,7 +1,8 @@
 """
 Ultimate introduction of pygame
 
-#TODO see from 1:53:28 (game over and restart game)
+#TODO show black background correctly
+#TODO see from 1:59:47 (show score)
 https://youtu.be/AY9MnQ4x3zk
 
 Explanation on Rectangle 51:40
