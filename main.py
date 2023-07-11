@@ -3,16 +3,24 @@ from sys import exit
 
 
 def display_score():
-    current_time = pygame.time.get_ticks()
-    score_surf = test_font.render(f"Score{current_time}", False, "white")
+    current_time = int(
+        pygame.time.get_ticks() / 1000) - start_time  # "pygame.time.get_tickes() count time spent from when "pygame.init()""
+    score_surf = test_font.render(f"{current_time}", False, "white")
     score_rect = score_surf.get_rect(midbottom=(400, 50))
     screen.blit(score_surf, score_rect)
+
+    score_f_surf = test_font.render(f"Score:", False, "white")
+    score_f_rect = score_f_surf.get_rect(midbottom=(300, 50))
+    screen.blit(score_f_surf, score_f_rect)
+
+    print(current_time)
 
 
 pygame.init()
 screen = pygame.display.set_mode((800, 400))
 pygame.display.set_caption("Runner")
 clock = pygame.time.Clock()
+start_time = 0
 
 FLAME_RATE = 60  # set refreash times/second
 
@@ -23,9 +31,9 @@ test_font = pygame.font.Font("font/Pixeltype.ttf", 50)  # Create text
 text_surf = test_font.render("My game", True, "#ffffff")
 text_rect = text_surf.get_rect(midbottom=(100, 50))
 
+# set text "Game over"
 game_over_surf = test_font.render("Game over", True, "white")
 game_over_rect = game_over_surf.get_rect(midbottom=(400, 250))
-
 
 """
 Import image 
@@ -62,11 +70,12 @@ while True:  # This while roop is important to keep screen showing
             if event.type == pygame.MOUSEBUTTONDOWN and player_rect.bottom >= 300:  # Check if mouse buttom is pressed
                 if player_rect.collidepoint(event.pos):
                     player_gravity = -20
-                    print(event.pos)
+                    # print(event.pos)
         else:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_s:
                     snail_rect.x = 800
+                    start_time = int(pygame.time.get_ticks() / 1000)
                     game_active = True
 
     if game_active:
@@ -77,26 +86,26 @@ while True:  # This while roop is important to keep screen showing
         screen.blit(text_surf, text_rect)
         screen.blit(snail_surf, snail_rect)
         screen.blit(player_surf, player_rect)
-
         # pygame.draw.line(screen, "white", start_pos=(50, 50), end_pos=pygame.mouse.get_pos(), width=5) #Draw line
 
         display_score()
 
-        print(player_rect.y)
         player_gravity += 1
         player_rect.y += player_gravity
-        if player_rect.bottom > 300: player_rect.bottom = 300  # set floor of player
-        if player_rect.top < 50: player_rect.top = 50
+        if player_rect.bottom > 300:
+            player_rect.bottom = 300  # set floor of player
+        if player_rect.top < 50:
+            player_rect.top = 50
 
         snail_rect.x -= 3
-
-        if snail_rect.left < 50: snail_rect.left = 800
+        if snail_rect.left < 50:
+            snail_rect.left = 800
 
         if player_rect.colliderect(snail_rect):  # This will return 0(False) if no collide, 1 if collide (True)
             game_active = False
 
     else:
-        screen.blit(game_over_surf, game_over_rect)
+        screen.blit(game_over_surf, game_over_rect) #TODO to wait for a while and change screen to initial
 
         # (Method 2) event by a key is pressed
         # keys = pygame.key.get_pressed()
