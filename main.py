@@ -1,5 +1,6 @@
 import pygame
 from sys import exit
+import time
 
 
 def display_score():
@@ -33,13 +34,14 @@ text_rect = text_surf.get_rect(midbottom=(100, 50))
 
 # set text "Game over"
 game_over_surf = test_font.render("Game over", True, "white")
-game_over_rect = game_over_surf.get_rect(midbottom=(400, 250))
+game_over_rect = game_over_surf.get_rect(midbottom=(700, 50))  # original (400, 250)
 
 """
 Import image 
 "convert()", and "convert_alpha()" make graphics easier and faster to be handled by pygame
 """
 # Import image and rectangle
+# TODO to change file to png which has transparent of background. Then, add ".convert_alpha()"
 sky_surface = pygame.image.load("graphics/sky_800.jpg").convert()
 ground_surface = pygame.image.load("graphics/ground_800.jpg").convert()
 bg_surface = pygame.image.load("graphics/bg_black.jpg").convert()
@@ -49,6 +51,14 @@ snail_rect = snail_surf.get_rect(bottomright=(800, 300))
 
 player_surf = pygame.image.load("graphics/player/player.png").convert_alpha()
 player_rect = player_surf.get_rect(bottomleft=(50, 300))  # set rectangle
+
+# Intro screen
+player_stand = pygame.image.load("graphics/player/mario_initial_SC.png").convert_alpha()
+# player_stand = pygame.transform.scale2x(player_stand)
+player_stand = pygame.transform.rotozoom(player_stand, -45, 2)  # (image, rotation, scale)
+player_stand_rect = player_stand.get_rect(center=(400, 200))
+
+#TODO to the Intro screen, add game title, score and instructions to start the game.
 
 player_gravity = 0
 
@@ -105,7 +115,10 @@ while True:  # This while roop is important to keep screen showing
             game_active = False
 
     else:
-        screen.blit(game_over_surf, game_over_rect) #TODO to wait for a while and change screen to initial
+        # screen.blit(game_over_surf, game_over_rect) #TODO to wait for a while and change screen to initial
+        # time.sleep(3)
+        screen.fill((94, 129, 162))
+        screen.blit(player_stand, player_stand_rect)
 
         # (Method 2) event by a key is pressed
         # keys = pygame.key.get_pressed()
