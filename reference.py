@@ -1,8 +1,7 @@
 """
 Ultimate introduction of pygame
 
-#TODO show black background correctly
-#TODO see from 2:09:00 (set initial screen)
+#TODO see from 2:23:14 (set score at initial screen)
 https://youtu.be/AY9MnQ4x3zk
 
 Explanation on Rectangle 51:40

@@ -14,7 +14,7 @@ def display_score():
     score_f_rect = score_f_surf.get_rect(midbottom=(300, 50))
     screen.blit(score_f_surf, score_f_rect)
 
-    print(current_time)
+    return current_time # or we can use "global current_time"
 
 
 pygame.init()
@@ -22,6 +22,7 @@ screen = pygame.display.set_mode((800, 400))
 pygame.display.set_caption("Runner")
 clock = pygame.time.Clock()
 start_time = 0
+current_time = 0
 
 FLAME_RATE = 60  # set refreash times/second
 
@@ -29,12 +30,16 @@ FLAME_RATE = 60  # set refreash times/second
 test_font = pygame.font.Font("font/Pixeltype.ttf", 50)  # Create text
 
 # set text "My game"
-text_surf = test_font.render("My game", True, "#ffffff")
-text_rect = text_surf.get_rect(midbottom=(100, 50))
+game_title_surf = test_font.render("Pixel Runner", True, "#ffffff") # ("text", smooth(T/F), "font color")
+game_title_rect = game_title_surf.get_rect(midbottom=(100, 50))
 
 # set text "Game over"
 game_over_surf = test_font.render("Game over", True, "white")
 game_over_rect = game_over_surf.get_rect(midbottom=(700, 50))  # original (400, 250)
+
+# set text for score
+ini_score_surf = test_font.render(f"{current_time}", False, "white")
+ini_score_rect = ini_score_surf.get_rect(center=(400, 300))
 
 """
 Import image 
@@ -55,14 +60,17 @@ player_rect = player_surf.get_rect(bottomleft=(50, 300))  # set rectangle
 # Intro screen
 player_stand = pygame.image.load("graphics/player/mario_initial_SC.png").convert_alpha()
 # player_stand = pygame.transform.scale2x(player_stand)
-player_stand = pygame.transform.rotozoom(player_stand, -45, 2)  # (image, rotation, scale)
+player_stand = pygame.transform.rotozoom(player_stand, -45, 1)  # (image, rotation, scale)
 player_stand_rect = player_stand.get_rect(center=(400, 200))
 
-#TODO to the Intro screen, add game title, score and instructions to start the game.
+start_inst_surf = test_font.render("Press 'S' to start game", True, "white")
+start_inst_rect = start_inst_surf.get_rect(center=(400, 300))
+
+# TODO to the Intro screen, add game title, score and instructions to start the game.
 
 player_gravity = 0
 
-game_active = True
+game_active = False
 
 while True:  # This while roop is important to keep screen showing
     for event in pygame.event.get():  # Keep looking all event
@@ -93,12 +101,12 @@ while True:  # This while roop is important to keep screen showing
         screen.blit(bg_surface, (0, 0))
         screen.blit(sky_surface, (50, 50))
         screen.blit(ground_surface, (50, 300))
-        screen.blit(text_surf, text_rect)
+        screen.blit(game_title_surf, game_title_rect)
         screen.blit(snail_surf, snail_rect)
         screen.blit(player_surf, player_rect)
         # pygame.draw.line(screen, "white", start_pos=(50, 50), end_pos=pygame.mouse.get_pos(), width=5) #Draw line
 
-        display_score()
+        current_time = display_score()
 
         player_gravity += 1
         player_rect.y += player_gravity
@@ -114,11 +122,15 @@ while True:  # This while roop is important to keep screen showing
         if player_rect.colliderect(snail_rect):  # This will return 0(False) if no collide, 1 if collide (True)
             game_active = False
 
-    else:
+    else:  # Game_active is False
         # screen.blit(game_over_surf, game_over_rect) #TODO to wait for a while and change screen to initial
         # time.sleep(3)
         screen.fill((94, 129, 162))
         screen.blit(player_stand, player_stand_rect)
+        screen.blit(game_title_surf, game_title_rect)
+        if current_time == 0:
+            screen.blit(start_inst_surf, start_inst_rect)
+        else: screen.blit(ini_score_surf, ini_score_rect) #TODO to fix to show score correctly in the initial screen
 
         # (Method 2) event by a key is pressed
         # keys = pygame.key.get_pressed()
