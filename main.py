@@ -14,7 +14,7 @@ def display_score():
     score_f_rect = score_f_surf.get_rect(midbottom=(300, 50))
     screen.blit(score_f_surf, score_f_rect)
 
-    return current_time # or we can use "global current_time"
+    return current_time  # or we can use "global current_time"
 
 
 pygame.init()
@@ -30,16 +30,12 @@ FLAME_RATE = 60  # set refreash times/second
 test_font = pygame.font.Font("font/Pixeltype.ttf", 50)  # Create text
 
 # set text "My game"
-game_title_surf = test_font.render("Pixel Runner", True, "#ffffff") # ("text", smooth(T/F), "font color")
+game_title_surf = test_font.render("Pixel Runner", True, "#ffffff")  # ("text", smooth(T/F), "font color")
 game_title_rect = game_title_surf.get_rect(midbottom=(100, 50))
 
 # set text "Game over"
 game_over_surf = test_font.render("Game over", True, "white")
 game_over_rect = game_over_surf.get_rect(midbottom=(700, 50))  # original (400, 250)
-
-# set text for score
-ini_score_surf = test_font.render(f"{current_time}", False, "white")
-ini_score_rect = ini_score_surf.get_rect(center=(400, 300))
 
 """
 Import image 
@@ -51,8 +47,11 @@ sky_surface = pygame.image.load("graphics/sky_800.jpg").convert()
 ground_surface = pygame.image.load("graphics/ground_800.jpg").convert()
 bg_surface = pygame.image.load("graphics/bg_black.jpg").convert()
 
+# Obstacles
 snail_surf = pygame.image.load("graphics/snail/snail_2.png").convert_alpha()
 snail_rect = snail_surf.get_rect(bottomright=(800, 300))
+#TODO create list of obstacles
+
 
 player_surf = pygame.image.load("graphics/player/player.png").convert_alpha()
 player_rect = player_surf.get_rect(bottomleft=(50, 300))  # set rectangle
@@ -66,11 +65,12 @@ player_stand_rect = player_stand.get_rect(center=(400, 200))
 start_inst_surf = test_font.render("Press 'S' to start game", True, "white")
 start_inst_rect = start_inst_surf.get_rect(center=(400, 300))
 
-# TODO to the Intro screen, add game title, score and instructions to start the game.
-
 player_gravity = 0
-
 game_active = False
+
+# Timer
+obstacle_timer = pygame.USEREVENT + 1
+pygame.time.set_timer(obstacle_timer, 900)
 
 while True:  # This while roop is important to keep screen showing
     for event in pygame.event.get():  # Keep looking all event
@@ -96,6 +96,11 @@ while True:  # This while roop is important to keep screen showing
                     start_time = int(pygame.time.get_ticks() / 1000)
                     game_active = True
 
+        if event.type == obstacle_timer and game_active:
+
+            print(f'test')
+
+
     if game_active:
         # attach image to screen
         screen.blit(bg_surface, (0, 0))
@@ -107,6 +112,7 @@ while True:  # This while roop is important to keep screen showing
         # pygame.draw.line(screen, "white", start_pos=(50, 50), end_pos=pygame.mouse.get_pos(), width=5) #Draw line
 
         current_time = display_score()
+
 
         player_gravity += 1
         player_rect.y += player_gravity
@@ -130,7 +136,13 @@ while True:  # This while roop is important to keep screen showing
         screen.blit(game_title_surf, game_title_rect)
         if current_time == 0:
             screen.blit(start_inst_surf, start_inst_rect)
-        else: screen.blit(ini_score_surf, ini_score_rect) #TODO to fix to show score correctly in the initial screen
+        else:
+            # set text for score
+            ini_score_surf = test_font.render(f"Your last score: {current_time}", False, "white")
+            ini_score_rect = ini_score_surf.get_rect(center=(400, 300))
+
+            screen.blit(start_inst_surf, start_inst_surf.get_rect(center=(400, 350)))
+            screen.blit(ini_score_surf, ini_score_rect)  # TODO to fix to show score correctly in the initial screen
 
         # (Method 2) event by a key is pressed
         # keys = pygame.key.get_pressed()
