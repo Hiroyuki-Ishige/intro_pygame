@@ -1,6 +1,7 @@
 import pygame
 from sys import exit
 import time
+from random import randint
 
 
 def display_score():
@@ -15,6 +16,18 @@ def display_score():
     screen.blit(score_f_surf, score_f_rect)
 
     return current_time  # or we can use "global current_time"
+
+def obstacle_movement(obstacle_list):
+    if obstacle_list:
+        for obstacle_rect in obstacle_list:
+            obstacle_rect.x -=5
+
+            screen.blit(snail_surf, obstacle_rect)
+
+        return obstacle_list
+
+    # else:
+    #     return []
 
 
 pygame.init()
@@ -50,9 +63,10 @@ bg_surface = pygame.image.load("graphics/bg_black.jpg").convert()
 # Obstacles
 snail_surf = pygame.image.load("graphics/snail/snail_2.png").convert_alpha()
 snail_rect = snail_surf.get_rect(bottomright=(800, 300))
-#TODO create list of obstacles
 
+obstacle_rect_list = []
 
+# Player
 player_surf = pygame.image.load("graphics/player/player.png").convert_alpha()
 player_rect = player_surf.get_rect(bottomleft=(50, 300))  # set rectangle
 
@@ -69,7 +83,7 @@ player_gravity = 0
 game_active = False
 
 # Timer
-obstacle_timer = pygame.USEREVENT + 1
+obstacle_timer = pygame.USEREVENT + 1 # create custom user event. Ref https://coderslegacy.com/python/pygame-userevents/
 pygame.time.set_timer(obstacle_timer, 900)
 
 while True:  # This while roop is important to keep screen showing
@@ -97,9 +111,9 @@ while True:  # This while roop is important to keep screen showing
                     game_active = True
 
         if event.type == obstacle_timer and game_active:
+            obstacle_rect_list.append(snail_surf.get_rect(bottomright=(randint(800, 1100), 300)))
 
-            print(f'test')
-
+#TODO check logic of error happening at line 114. See video 2:34:16
 
     if game_active:
         # attach image to screen
@@ -113,7 +127,7 @@ while True:  # This while roop is important to keep screen showing
 
         current_time = display_score()
 
-
+        # Player
         player_gravity += 1
         player_rect.y += player_gravity
         if player_rect.bottom > 300:
@@ -121,9 +135,12 @@ while True:  # This while roop is important to keep screen showing
         if player_rect.top < 50:
             player_rect.top = 50
 
-        snail_rect.x -= 3
-        if snail_rect.left < 50:
-            snail_rect.left = 800
+
+        # Obstacle movement
+        obstacle_rect_list = obstacle_movement(obstacle_rect_list)
+        # snail_rect.x -= 3
+        # if snail_rect.left < 50:
+        #     snail_rect.left = 800
 
         if player_rect.colliderect(snail_rect):  # This will return 0(False) if no collide, 1 if collide (True)
             game_active = False
@@ -142,7 +159,7 @@ while True:  # This while roop is important to keep screen showing
             ini_score_rect = ini_score_surf.get_rect(center=(400, 300))
 
             screen.blit(start_inst_surf, start_inst_surf.get_rect(center=(400, 350)))
-            screen.blit(ini_score_surf, ini_score_rect)  # TODO to fix to show score correctly in the initial screen
+            screen.blit(ini_score_surf, ini_score_rect)
 
         # (Method 2) event by a key is pressed
         # keys = pygame.key.get_pressed()
