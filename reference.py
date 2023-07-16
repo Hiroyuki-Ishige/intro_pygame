@@ -1,7 +1,7 @@
 """
 Ultimate introduction of pygame
 
-#TODO see from 2:28:44 (create list of obstacle rectangles)
+#TODO see from 2:36:25 (delete rectables when they leave the screen)
 https://youtu.be/AY9MnQ4x3zk
 
 Explanation on Rectangle 51:40

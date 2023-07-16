@@ -17,17 +17,18 @@ def display_score():
 
     return current_time  # or we can use "global current_time"
 
+
 def obstacle_movement(obstacle_list):
     if obstacle_list:
         for obstacle_rect in obstacle_list:
-            obstacle_rect.x -=5
-
+            obstacle_rect.x -= 5
             screen.blit(snail_surf, obstacle_rect)
-
         return obstacle_list
 
-    # else:
-    #     return []
+    else:
+        return []
+
+    # print(f'obstacle_list in def:{obstacle_list}')
 
 
 pygame.init()
@@ -83,8 +84,8 @@ player_gravity = 0
 game_active = False
 
 # Timer
-obstacle_timer = pygame.USEREVENT + 1 # create custom user event. Ref https://coderslegacy.com/python/pygame-userevents/
-pygame.time.set_timer(obstacle_timer, 900)
+obstacle_timer = pygame.USEREVENT + 1  # create custom user event. Ref https://coderslegacy.com/python/pygame-userevents/
+pygame.time.set_timer(obstacle_timer, 1500)  # tell pygame to triger the obstacle_timer event constantly
 
 while True:  # This while roop is important to keep screen showing
     for event in pygame.event.get():  # Keep looking all event
@@ -110,10 +111,12 @@ while True:  # This while roop is important to keep screen showing
                     start_time = int(pygame.time.get_ticks() / 1000)
                     game_active = True
 
-        if event.type == obstacle_timer and game_active:
-            obstacle_rect_list.append(snail_surf.get_rect(bottomright=(randint(800, 1100), 300)))
+        print(f'test to show obstacle list before game on{obstacle_rect_list}')
 
-#TODO check logic of error happening at line 114. See video 2:34:16
+        if event.type == obstacle_timer and game_active:
+            print(f'test to show obstacle list after game on{obstacle_rect_list}')
+
+            obstacle_rect_list.append(snail_surf.get_rect(bottomright=(randint(800, 1100), 300)))
 
     if game_active:
         # attach image to screen
@@ -134,7 +137,6 @@ while True:  # This while roop is important to keep screen showing
             player_rect.bottom = 300  # set floor of player
         if player_rect.top < 50:
             player_rect.top = 50
-
 
         # Obstacle movement
         obstacle_rect_list = obstacle_movement(obstacle_rect_list)
