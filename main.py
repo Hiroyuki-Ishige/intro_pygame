@@ -22,13 +22,26 @@ def obstacle_movement(obstacle_list):
     if obstacle_list:
         for obstacle_rect in obstacle_list:
             obstacle_rect.x -= 5
-            screen.blit(snail_surf, obstacle_rect)
+
+            if obstacle_rect.bottom == 300:
+                screen.blit(snail_surf, obstacle_rect)
+            elif obstacle_rect.bottom == 200:
+                screen.blit(fly_surf, obstacle_rect)
+
+        obstacle_list = [obstacle for obstacle in obstacle_list if obstacle.x > 50] # delete obstacle when is out of screen
+
         return obstacle_list
 
     else:
         return []
 
-    # print(f'obstacle_list in def:{obstacle_list}')
+def collisions(player, obstacles):
+    if obstacles: #if there is obstacles in the list
+        for obstacle_rect in obstacles:
+            if player.colliderect(obstacle_rect):
+                return False
+
+    return True
 
 
 pygame.init()
@@ -62,8 +75,10 @@ ground_surface = pygame.image.load("graphics/ground_800.jpg").convert()
 bg_surface = pygame.image.load("graphics/bg_black.jpg").convert()
 
 # Obstacles
-snail_surf = pygame.image.load("graphics/snail/snail_2.png").convert_alpha()
-snail_rect = snail_surf.get_rect(bottomright=(800, 300))
+snail_surf = pygame.image.load("graphics/snail/snail1.png").convert_alpha()
+# snail_rect = snail_surf.get_rect(bottomright=(800, 300))
+fly_surf = pygame.image.load("graphics/fly/fly1.png").convert_alpha()
+
 
 obstacle_rect_list = []
 
@@ -107,16 +122,15 @@ while True:  # This while roop is important to keep screen showing
         else:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_s:
-                    snail_rect.x = 800
+                    # snail_rect.x = 800
                     start_time = int(pygame.time.get_ticks() / 1000)
                     game_active = True
 
-        print(f'test to show obstacle list before game on{obstacle_rect_list}')
-
         if event.type == obstacle_timer and game_active:
-            print(f'test to show obstacle list after game on{obstacle_rect_list}')
-
-            obstacle_rect_list.append(snail_surf.get_rect(bottomright=(randint(800, 1100), 300)))
+            if randint(0,2): # generate randum 0 = false or 1 = True and judge if True
+                obstacle_rect_list.append(snail_surf.get_rect(bottomright=(randint(800, 1100), 300)))
+            else:
+                obstacle_rect_list.append(fly_surf.get_rect(bottomright=(randint(800, 1100), 200)))
 
     if game_active:
         # attach image to screen
@@ -124,7 +138,7 @@ while True:  # This while roop is important to keep screen showing
         screen.blit(sky_surface, (50, 50))
         screen.blit(ground_surface, (50, 300))
         screen.blit(game_title_surf, game_title_rect)
-        screen.blit(snail_surf, snail_rect)
+        # screen.blit(snail_surf, snail_rect)
         screen.blit(player_surf, player_rect)
         # pygame.draw.line(screen, "white", start_pos=(50, 50), end_pos=pygame.mouse.get_pos(), width=5) #Draw line
 
@@ -140,12 +154,11 @@ while True:  # This while roop is important to keep screen showing
 
         # Obstacle movement
         obstacle_rect_list = obstacle_movement(obstacle_rect_list)
-        # snail_rect.x -= 3
-        # if snail_rect.left < 50:
-        #     snail_rect.left = 800
 
-        if player_rect.colliderect(snail_rect):  # This will return 0(False) if no collide, 1 if collide (True)
-            game_active = False
+        # Collision
+        # if player_rect.colliderect(snail_rect):  # This will return 0(False) if no collide, 1 if collide (True)
+        #     game_active = False
+        game_active = collisions(player = player_rect, obstacles=obstacle_rect_list)
 
     else:  # Game_active is False
         # screen.blit(game_over_surf, game_over_rect) #TODO to wait for a while and change screen to initial
