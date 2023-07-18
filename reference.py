@@ -1,7 +1,7 @@
 """
 Ultimate introduction of pygame
 
-#TODO see from 2:36:25 (delete rectables when they leave the screen)
+#TODO see from 2:59:17 (update logic of collidion)
 https://youtu.be/AY9MnQ4x3zk
 
 Explanation on Rectangle 51:40

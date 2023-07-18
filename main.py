@@ -39,10 +39,24 @@ def collisions(player, obstacles):
     if obstacles: #if there is obstacles in the list
         for obstacle_rect in obstacles:
             if player.colliderect(obstacle_rect):
+
                 return False
 
     return True
 
+def player_animation():
+    global player_surf, player_index
+    # play walking animation if the player is on floor
+    if player_rect.bottom < 300:
+        player_surf = player_jump
+    else:
+        player_index += 0.05
+        if player_index >= len(player_walk):
+            player_index = 0
+        player_surf = player_walk[int(player_index)]
+
+
+    # display the jump surface when playe is not on floor
 
 pygame.init()
 screen = pygame.display.set_mode((800, 400))
@@ -83,13 +97,19 @@ fly_surf = pygame.image.load("graphics/fly/fly1.png").convert_alpha()
 obstacle_rect_list = []
 
 # Player
-player_surf = pygame.image.load("graphics/player/player.png").convert_alpha()
+player_walk_1 = pygame.image.load("graphics/player/player_walk_1.png").convert_alpha()
+player_walk_2 = pygame.image.load("graphics/player/player_walk_2.png").convert_alpha()
+player_walk = [player_walk_1, player_walk_2]
+player_index = 0
+player_jump = pygame.image.load("graphics/player/jump.png").convert_alpha()
+
+player_surf = player_walk[player_index]
 player_rect = player_surf.get_rect(bottomleft=(50, 300))  # set rectangle
 
 # Intro screen
-player_stand = pygame.image.load("graphics/player/mario_initial_SC.png").convert_alpha()
+player_stand = pygame.image.load("graphics/player/player_stand.png").convert_alpha()
 # player_stand = pygame.transform.scale2x(player_stand)
-player_stand = pygame.transform.rotozoom(player_stand, -45, 1)  # (image, rotation, scale)
+player_stand = pygame.transform.rotozoom(player_stand, 0, 1)  # (image, rotation, scale)
 player_stand_rect = player_stand.get_rect(center=(400, 200))
 
 start_inst_surf = test_font.render("Press 'S' to start game", True, "white")
@@ -122,7 +142,7 @@ while True:  # This while roop is important to keep screen showing
         else:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_s:
-                    # snail_rect.x = 800
+
                     start_time = int(pygame.time.get_ticks() / 1000)
                     game_active = True
 
@@ -139,7 +159,7 @@ while True:  # This while roop is important to keep screen showing
         screen.blit(ground_surface, (50, 300))
         screen.blit(game_title_surf, game_title_rect)
         # screen.blit(snail_surf, snail_rect)
-        screen.blit(player_surf, player_rect)
+
         # pygame.draw.line(screen, "white", start_pos=(50, 50), end_pos=pygame.mouse.get_pos(), width=5) #Draw line
 
         current_time = display_score()
@@ -152,20 +172,28 @@ while True:  # This while roop is important to keep screen showing
         if player_rect.top < 50:
             player_rect.top = 50
 
+        player_animation()
+        screen.blit(player_surf, player_rect)
+
         # Obstacle movement
         obstacle_rect_list = obstacle_movement(obstacle_rect_list)
 
         # Collision
         # if player_rect.colliderect(snail_rect):  # This will return 0(False) if no collide, 1 if collide (True)
         #     game_active = False
-        game_active = collisions(player = player_rect, obstacles=obstacle_rect_list)
+        game_active = collisions(player = player_rect, obstacles=obstacle_rect_list) # This will return 0(False) if no collide, 1 if collide (True)
 
     else:  # Game_active is False
-        # screen.blit(game_over_surf, game_over_rect) #TODO to wait for a while and change screen to initial
-        # time.sleep(3)
+        #TODO to wait for a while and change screen to initial
+
         screen.fill((94, 129, 162))
         screen.blit(player_stand, player_stand_rect)
         screen.blit(game_title_surf, game_title_rect)
+
+        # set obstacles and player at initial position
+        obstacle_rect_list.clear()
+        player_rect.bottomleft = (50, 300)
+
         if current_time == 0:
             screen.blit(start_inst_surf, start_inst_rect)
         else:
