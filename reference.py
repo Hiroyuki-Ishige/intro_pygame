@@ -1,7 +1,7 @@
 """
 Ultimate introduction of pygame
 
-#TODO see from 2:59:17 (update logic of collidion)
+#TODO see from 3:15:54 (create class for player)
 https://youtu.be/AY9MnQ4x3zk
 
 Explanation on Rectangle 51:40

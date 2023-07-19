@@ -4,6 +4,13 @@ import time
 from random import randint
 
 
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.image.load("graphics/player/player_walk_1.png").convert_alpha()
+        self.rect = self.image.get_rect(midbottom=(200, 300))
+
+
 def display_score():
     current_time = int(
         pygame.time.get_ticks() / 1000) - start_time  # "pygame.time.get_tickes() count time spent from when "pygame.init()""
@@ -28,21 +35,23 @@ def obstacle_movement(obstacle_list):
             elif obstacle_rect.bottom == 200:
                 screen.blit(fly_surf, obstacle_rect)
 
-        obstacle_list = [obstacle for obstacle in obstacle_list if obstacle.x > 50] # delete obstacle when is out of screen
+        obstacle_list = [obstacle for obstacle in obstacle_list if
+                         obstacle.x > 50]  # delete obstacle when is out of screen
 
         return obstacle_list
 
     else:
         return []
 
+
 def collisions(player, obstacles):
-    if obstacles: #if there is obstacles in the list
+    if obstacles:  # if there is obstacles in the list
         for obstacle_rect in obstacles:
             if player.colliderect(obstacle_rect):
-
                 return False
 
     return True
+
 
 def player_animation():
     global player_surf, player_index
@@ -55,8 +64,8 @@ def player_animation():
             player_index = 0
         player_surf = player_walk[int(player_index)]
 
-
     # display the jump surface when playe is not on floor
+
 
 pygame.init()
 screen = pygame.display.set_mode((800, 400))
@@ -66,6 +75,9 @@ start_time = 0
 current_time = 0
 
 FLAME_RATE = 60  # set refreash times/second
+
+player = pygame.sprite.GroupSingle()
+player.add(Player())
 
 # set text and rectangle
 test_font = pygame.font.Font("font/Pixeltype.ttf", 50)  # Create text
@@ -88,15 +100,23 @@ sky_surface = pygame.image.load("graphics/sky_800.jpg").convert()
 ground_surface = pygame.image.load("graphics/ground_800.jpg").convert()
 bg_surface = pygame.image.load("graphics/bg_black.jpg").convert()
 
-# Obstacles
-snail_surf = pygame.image.load("graphics/snail/snail1.png").convert_alpha()
-# snail_rect = snail_surf.get_rect(bottomright=(800, 300))
-fly_surf = pygame.image.load("graphics/fly/fly1.png").convert_alpha()
+# Snail
+snail_frame_1 = pygame.image.load("graphics/snail/snail1.png").convert_alpha()
+snail_frame_2 = pygame.image.load("graphics/snail/snail2.png").convert_alpha()
+snail_frames = [snail_frame_1, snail_frame_2]
+snail_frame_index = 0
+snail_surf = snail_frames[snail_frame_index]
 
+# Fly
+fly_frame_1 = pygame.image.load("graphics/fly/fly1.png").convert_alpha()
+fly_frame_2 = pygame.image.load("graphics/fly/fly2.png").convert_alpha()
+fly_frames = [fly_frame_1, fly_frame_2]
+fly_frame_index = 0
+fly_surf = fly_frames[fly_frame_index]
 
 obstacle_rect_list = []
 
-# Player
+# Player (surf -> rect -> blit)
 player_walk_1 = pygame.image.load("graphics/player/player_walk_1.png").convert_alpha()
 player_walk_2 = pygame.image.load("graphics/player/player_walk_2.png").convert_alpha()
 player_walk = [player_walk_1, player_walk_2]
@@ -120,7 +140,13 @@ game_active = False
 
 # Timer
 obstacle_timer = pygame.USEREVENT + 1  # create custom user event. Ref https://coderslegacy.com/python/pygame-userevents/
-pygame.time.set_timer(obstacle_timer, 1500)  # tell pygame to triger the obstacle_timer event constantly
+pygame.time.set_timer(obstacle_timer, 1500)  # tell pygame to trigger the obstacle_timer event constantly
+
+snail_animation_timer = pygame.USEREVENT + 2
+pygame.time.set_timer(snail_animation_timer, 500)
+
+fly_animation_timer = pygame.USEREVENT + 3
+pygame.time.set_timer(fly_animation_timer, 200)
 
 while True:  # This while roop is important to keep screen showing
     for event in pygame.event.get():  # Keep looking all event
@@ -142,15 +168,29 @@ while True:  # This while roop is important to keep screen showing
         else:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_s:
-
                     start_time = int(pygame.time.get_ticks() / 1000)
                     game_active = True
 
-        if event.type == obstacle_timer and game_active:
-            if randint(0,2): # generate randum 0 = false or 1 = True and judge if True
-                obstacle_rect_list.append(snail_surf.get_rect(bottomright=(randint(800, 1100), 300)))
-            else:
-                obstacle_rect_list.append(fly_surf.get_rect(bottomright=(randint(800, 1100), 200)))
+        if game_active:
+            if event.type == obstacle_timer:
+                if randint(0, 2):  # generate randum 0 = false or 1 = True and judge if True
+                    obstacle_rect_list.append(snail_surf.get_rect(bottomright=(randint(800, 1100), 300)))
+                else:
+                    obstacle_rect_list.append(fly_surf.get_rect(bottomright=(randint(800, 1100), 200)))
+
+            if event.type == snail_animation_timer:
+                if snail_frame_index == 0:
+                    snail_frame_index = 1
+                else:
+                    snail_frame_index = 0
+                snail_surf = snail_frames[snail_frame_index]
+
+            if event.type == fly_animation_timer:
+                if fly_frame_index == 0:
+                    fly_frame_index = 1
+                else:
+                    fly_frame_index = 0
+                fly_surf = fly_frames[fly_frame_index]
 
     if game_active:
         # attach image to screen
@@ -174,6 +214,7 @@ while True:  # This while roop is important to keep screen showing
 
         player_animation()
         screen.blit(player_surf, player_rect)
+        player.draw(screen)
 
         # Obstacle movement
         obstacle_rect_list = obstacle_movement(obstacle_rect_list)
@@ -181,10 +222,11 @@ while True:  # This while roop is important to keep screen showing
         # Collision
         # if player_rect.colliderect(snail_rect):  # This will return 0(False) if no collide, 1 if collide (True)
         #     game_active = False
-        game_active = collisions(player = player_rect, obstacles=obstacle_rect_list) # This will return 0(False) if no collide, 1 if collide (True)
+        game_active = collisions(player=player_rect,
+                                 obstacles=obstacle_rect_list)  # This will return 0(False) if no collide, 1 if collide (True)
 
     else:  # Game_active is False
-        #TODO to wait for a while and change screen to initial
+        # TODO to wait for a while and change screen to initial
 
         screen.fill((94, 129, 162))
         screen.blit(player_stand, player_stand_rect)
