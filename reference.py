@@ -1,7 +1,7 @@
 """
 Ultimate introduction of pygame
 
-#TODO see from 3:15:54 (create class for player)
+#TODO see from 3:25:00 (create class for obstacle)
 https://youtu.be/AY9MnQ4x3zk
 
 Explanation on Rectangle 51:40

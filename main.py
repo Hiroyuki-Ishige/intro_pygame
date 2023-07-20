@@ -7,9 +7,40 @@ from random import randint
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.image.load("graphics/player/player_walk_1.png").convert_alpha()
-        self.rect = self.image.get_rect(midbottom=(200, 300))
+        self.player_walk_1 = pygame.image.load("graphics/player/player_walk_1.png").convert_alpha()
+        self.player_walk_2 = pygame.image.load("graphics/player/player_walk_2.png").convert_alpha()
+        self.player_walk = [self.player_walk_1, self.player_walk_2]
+        self.player_index = 0
+        self.player_jump = pygame.image.load("graphics/player/jump.png").convert_alpha()
 
+        self.image = self.player_walk[self.player_index]
+        self.rect = self.image.get_rect(midbottom=(200, 300))
+        self.gravity = 0
+
+    def player_input(self):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_SPACE] and self.rect.bottom >=300:
+            self.gravity = -20
+
+    def apply_gravity(self):
+        self.gravity +=1
+        self.rect.y +=self.gravity
+        if self.rect.bottom >=300:
+            self.rect.bottom = 300
+
+    def animation_state(self):
+        if self.rect.bottom <300:
+            self.image = self.player_jump
+        else:
+            self.player_index += 0.1
+            if self.player_index >= len(self.player_walk):
+                self.player_index = 0
+            self.image = self.player_walk[int(self.player_index)]
+
+    def update(self):
+        self.player_input()
+        self.apply_gravity()
+        self.animation_state()
 
 def display_score():
     current_time = int(
@@ -76,6 +107,7 @@ current_time = 0
 
 FLAME_RATE = 60  # set refreash times/second
 
+# Create player from Class Player
 player = pygame.sprite.GroupSingle()
 player.add(Player())
 
@@ -214,7 +246,10 @@ while True:  # This while roop is important to keep screen showing
 
         player_animation()
         screen.blit(player_surf, player_rect)
+
         player.draw(screen)
+        player.update()
+
 
         # Obstacle movement
         obstacle_rect_list = obstacle_movement(obstacle_rect_list)
