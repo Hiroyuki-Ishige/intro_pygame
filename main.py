@@ -1,3 +1,5 @@
+import random
+
 import pygame
 from sys import exit
 import time
@@ -19,17 +21,17 @@ class Player(pygame.sprite.Sprite):
 
     def player_input(self):
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE] and self.rect.bottom >=300:
+        if keys[pygame.K_SPACE] and self.rect.bottom >= 300:
             self.gravity = -20
 
     def apply_gravity(self):
-        self.gravity +=1
-        self.rect.y +=self.gravity
-        if self.rect.bottom >=300:
+        self.gravity += 1
+        self.rect.y += self.gravity
+        if self.rect.bottom >= 300:
             self.rect.bottom = 300
 
     def animation_state(self):
-        if self.rect.bottom <300:
+        if self.rect.bottom < 300:
             self.image = self.player_jump
         else:
             self.player_index += 0.1
@@ -41,6 +43,36 @@ class Player(pygame.sprite.Sprite):
         self.player_input()
         self.apply_gravity()
         self.animation_state()
+
+
+class Obstacle(pygame.sprite.Sprite):
+    def __init__(self, type):
+        super().__init__()
+
+        if type == "fly":
+            fly_1 = pygame.image.load("graphics/fly/fly1.png").convert_alpha()
+            fly_2 = pygame.image.load("graphics/fly/fly2.png").convert_alpha()
+            self.frames = [fly_1, fly_2]
+            y_pos = 210 #original 210
+        if type == "snail":
+            snail_1 = pygame.image.load("graphics/snail/snail1.png").convert_alpha()
+            snail_2 = pygame.image.load("graphics/snail/snail2.png").convert_alpha()
+            self.frames = [snail_1, snail_2]
+            y_pos = 200
+
+        self.animation_index = 0
+        self.image = self.frames[self.animation_index]
+        self.rect = self.image.get_rect(midbottom=(random.randint(900, 1100), y_pos))  # original (900, 1100)
+
+    def animation_state(self):
+        self.animation_index += 0.1
+        if self.animation_index >= len(self.frames):
+            self.animation_index = 0
+        self.image = self.frames[int(self.animation_index)]
+
+    def update(self):
+        self.animation_state()
+
 
 def display_score():
     current_time = int(
@@ -107,9 +139,11 @@ current_time = 0
 
 FLAME_RATE = 60  # set refreash times/second
 
-# Create player from Class Player
+# Groups
 player = pygame.sprite.GroupSingle()
 player.add(Player())
+
+obstacle_group = pygame.sprite.Group()
 
 # set text and rectangle
 test_font = pygame.font.Font("font/Pixeltype.ttf", 50)  # Create text
@@ -205,6 +239,8 @@ while True:  # This while roop is important to keep screen showing
 
         if game_active:
             if event.type == obstacle_timer:
+                obstacle_group.add(Obstacle("fly"))
+
                 if randint(0, 2):  # generate randum 0 = false or 1 = True and judge if True
                     obstacle_rect_list.append(snail_surf.get_rect(bottomright=(randint(800, 1100), 300)))
                 else:
@@ -250,6 +286,7 @@ while True:  # This while roop is important to keep screen showing
         player.draw(screen)
         player.update()
 
+        obstacle_group.draw(screen)
 
         # Obstacle movement
         obstacle_rect_list = obstacle_movement(obstacle_rect_list)
