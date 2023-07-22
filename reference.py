@@ -1,7 +1,7 @@
 """
 Ultimate introduction of pygame
 
-#TODO see from 3:32:47 (to move obstacle)
+#TODO see from 3:41:32 (to fix error at collision)
 https://youtu.be/AY9MnQ4x3zk
 
 Explanation on Rectangle 51:40

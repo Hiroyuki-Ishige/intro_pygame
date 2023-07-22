@@ -16,7 +16,7 @@ class Player(pygame.sprite.Sprite):
         self.player_jump = pygame.image.load("graphics/player/jump.png").convert_alpha()
 
         self.image = self.player_walk[self.player_index]
-        self.rect = self.image.get_rect(midbottom=(200, 300))
+        self.rect = self.image.get_rect(midbottom=(100, 300))
         self.gravity = 0
 
     def player_input(self):
@@ -53,12 +53,12 @@ class Obstacle(pygame.sprite.Sprite):
             fly_1 = pygame.image.load("graphics/fly/fly1.png").convert_alpha()
             fly_2 = pygame.image.load("graphics/fly/fly2.png").convert_alpha()
             self.frames = [fly_1, fly_2]
-            y_pos = 210 #original 210
+            y_pos = 210  # original 210
         if type == "snail":
             snail_1 = pygame.image.load("graphics/snail/snail1.png").convert_alpha()
             snail_2 = pygame.image.load("graphics/snail/snail2.png").convert_alpha()
             self.frames = [snail_1, snail_2]
-            y_pos = 200
+            y_pos = 300
 
         self.animation_index = 0
         self.image = self.frames[self.animation_index]
@@ -70,8 +70,16 @@ class Obstacle(pygame.sprite.Sprite):
             self.animation_index = 0
         self.image = self.frames[int(self.animation_index)]
 
+    def destroy(self):  # Erase obstacles when it's beyond certail X point
+        if self.rect.x <= 50:
+            self.kill()
+
     def update(self):
         self.animation_state()
+        self.rect.x -= 6
+        self.destroy()
+
+
 
 
 def display_score():
@@ -115,6 +123,11 @@ def collisions(player, obstacles):
 
     return True
 
+def collitions_sprite():
+    if pygame.sprite.spritecollide(player.sprite, obstacle_group, False): #This line create list. Argument "False" does NOT erase obstacles. "True" erase obstacles
+        return False
+    else:
+        return True
 
 def player_animation():
     global player_surf, player_index
@@ -239,12 +252,15 @@ while True:  # This while roop is important to keep screen showing
 
         if game_active:
             if event.type == obstacle_timer:
-                obstacle_group.add(Obstacle("fly"))
+                obstacles = ["fly", "snail", "snail", "snail"]
+                rand_obstacle = random.choice(obstacles)
+                obstacle_group.add(Obstacle(rand_obstacle))
 
-                if randint(0, 2):  # generate randum 0 = false or 1 = True and judge if True
-                    obstacle_rect_list.append(snail_surf.get_rect(bottomright=(randint(800, 1100), 300)))
-                else:
-                    obstacle_rect_list.append(fly_surf.get_rect(bottomright=(randint(800, 1100), 200)))
+                # create obstacles NOT using class
+                # if randint(0, 2):  # generate randum 0 = false or 1 = True and judge if True
+                #     obstacle_rect_list.append(snail_surf.get_rect(bottomright=(randint(800, 1100), 300)))
+                # else:
+                #     obstacle_rect_list.append(fly_surf.get_rect(bottomright=(randint(800, 1100), 200)))
 
             if event.type == snail_animation_timer:
                 if snail_frame_index == 0:
@@ -273,29 +289,33 @@ while True:  # This while roop is important to keep screen showing
         current_time = display_score()
 
         # Player
-        player_gravity += 1
-        player_rect.y += player_gravity
-        if player_rect.bottom > 300:
-            player_rect.bottom = 300  # set floor of player
-        if player_rect.top < 50:
-            player_rect.top = 50
-
-        player_animation()
-        screen.blit(player_surf, player_rect)
+        # Create player by NOT using Class
+        # player_gravity += 1
+        # player_rect.y += player_gravity
+        # if player_rect.bottom > 300:
+        #     player_rect.bottom = 300  # set floor of player
+        # if player_rect.top < 50:
+        #     player_rect.top = 50
+        #
+        # player_animation()
+        # screen.blit(player_surf, player_rect)
 
         player.draw(screen)
         player.update()
 
+        # Obstacles
         obstacle_group.draw(screen)
+        obstacle_group.update()
 
         # Obstacle movement
-        obstacle_rect_list = obstacle_movement(obstacle_rect_list)
+        # obstacle_rect_list = obstacle_movement(obstacle_rect_list)
 
         # Collision
+        game_active = collitions_sprite()
         # if player_rect.colliderect(snail_rect):  # This will return 0(False) if no collide, 1 if collide (True)
         #     game_active = False
-        game_active = collisions(player=player_rect,
-                                 obstacles=obstacle_rect_list)  # This will return 0(False) if no collide, 1 if collide (True)
+        # game_active = collisions(player=player_rect,
+        #                          obstacles=obstacle_rect_list)  # This will return 0(False) if no collide, 1 if collide (True)
 
     else:  # Game_active is False
         # TODO to wait for a while and change screen to initial
@@ -306,6 +326,8 @@ while True:  # This while roop is important to keep screen showing
 
         # set obstacles and player at initial position
         obstacle_rect_list.clear()
+
+        # TODO fix bug at collision
         player_rect.bottomleft = (50, 300)
 
         if current_time == 0:
